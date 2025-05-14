@@ -17,7 +17,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": "npx wrangler publish",
+    "deploy": "npx wrangler deploy",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
