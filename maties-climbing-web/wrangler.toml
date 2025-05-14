@@ -1,5 +1,5 @@
 name             = "maties-climbing"
-main             = "workers-site"
+main             = "src"
 account_id       = "YOUR_ACCOUNT_ID"
 compatibility_date = "2025-05-14"
 
