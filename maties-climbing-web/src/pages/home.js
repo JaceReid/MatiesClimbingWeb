@@ -18,28 +18,33 @@ function HomePage() {
   };
 
   const title = {
-    width: "60%",
-    marginLeft: "20%",
+    width: "90%", // Increased from 60% for mobile
+    maxWidth: "800px", // Added max-width for larger screens
+    margin: "0 auto", // Centering with auto margins
     color: "white",
     textAlign: "center",
-    fontSize: "5rem",
+    fontSize: "clamp(2.5rem, 8vw, 5rem)", // Responsive font size
     fontWeight: "bold",
     position: "absolute",
     top: "50%",
-    transform: "translateY(-50%)",
-    backgroundColor: "rgba(2, 2, 59, 0.9)", // Dark blue with 70% opacity
-    padding: "20px", // Add some padding around the text
-    borderRadius: "10px", // Optional: rounded corners
-    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)", // Optional: text shadow for better contrast
+    left: "50%",
+    transform: "translate(-50%, -50%)", // Proper centering
+    backgroundColor: "rgba(2, 2, 59, 0.9)",
+    padding: "20px",
+    borderRadius: "10px",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
   };
 
   const separator = {
-    width: "60%",
-    marginLeft: "20%",
+    width: "90%", // Match title width
+    maxWidth: "800px", // Match title max-width
+    margin: "0 auto", // Centering
     height: "2px",
     backgroundColor: "white",
     position: "absolute",
     top: "calc(50% + 8rem)", // Adjusted to account for title padding
+    left: "50%",
+    transform: "translateX(-50%)", // Center horizontally
   };
 
   return (
