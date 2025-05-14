@@ -1,4 +1,4 @@
-name             = "maties climbing"
+name             = "maties-climbing"
 main             = "workers-site"
 type             = "javascript"
 account_id       = "YOUR_ACCOUNT_ID"
