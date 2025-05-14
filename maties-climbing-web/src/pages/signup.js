@@ -4,21 +4,20 @@ function SignupPage() {
   const formUrl = 'https://forms.gle/neKyxP3QSHGTzk5TA';
 
   const pageStyles = {
-    backgroundImage: `url(${require("../docs/wall-shed.jpg")})`, // Change to your preferred background image
+    backgroundImage: `url(${require("../docs/wall-shed.jpg")})`,
     backgroundSize: 'cover',
-    backgroundAttachment: "fixed",
     backgroundPosition: 'center',
     height: '100vh',
+    width: '100vw',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'fixed', // This prevents scrolling
+    top: 0,
+    left: 0,
+    overflow: 'hidden', // Ensures no scrollbars appear
     margin: 0,
-  };  
-  const pageBackground = {
-    backgroundSize: "cover",
-    backgroundAttachment: "fixed",
-    backgroundPosition: "center",
-    minHeight: "100vh",
+    padding: 0,
   };
 
   const boxStyles = {
