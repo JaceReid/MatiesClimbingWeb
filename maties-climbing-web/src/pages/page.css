@@ -9,3 +9,6 @@ h2 {
   background-color: #428BCA;
   margin: -12px -15px 10px;
 }
+body {
+  padding-top: 56px; /* Height of your navbar */
+}
