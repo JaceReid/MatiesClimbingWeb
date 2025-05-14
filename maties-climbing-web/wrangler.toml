@@ -1,0 +1,9 @@
+name             = "maties climbing"
+main             = "workers-site"
+type             = "javascript"
+account_id       = "YOUR_ACCOUNT_ID"
+compatibility_date = "2025-05-14"
+
+[site]
+bucket          = "./build"
+entry-point     = "workers-site"
