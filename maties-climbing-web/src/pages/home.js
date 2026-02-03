@@ -29,7 +29,7 @@ function HomePage() {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)", // Proper centering
-    backgroundColor: "rgba(2, 2, 59, 0.9)",
+    backgroundColor: "rgba(5, 1, 19, 0.9)",
     padding: "20px",
     borderRadius: "10px",
     textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",

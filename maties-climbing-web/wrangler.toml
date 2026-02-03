@@ -1,7 +1,0 @@
-name             = "maties-climbing"
-main             = "src"
-account_id       = "YOUR_ACCOUNT_ID"
-compatibility_date = "2025-05-14"
-
-[site]
-bucket          = "./build"

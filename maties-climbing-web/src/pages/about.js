@@ -71,9 +71,9 @@ function AboutPage() {
                 <div className="card shadow-sm">
                   <div className="card-body">
                     <ul className="list-unstyled">
-                      <li className="mb-2">💰 <strong>Membership:</strong> R600/year (students), R800 (non-students)</li>
+                      <li className="mb-2">💰 <strong>Membership:</strong> R680/year (students), R880 (non-students)</li>
                       <li className="mb-2">🎟️ <strong>Day pass:</strong> R50 (shoes included)</li>
-                      <li className="mb-0">💳 Payments via EFT or snapscan</li>
+                      <li className="mb-0">💳 Payments via EFT or Student Account</li>
                     </ul>
                   </div>
                 </div>

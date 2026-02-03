@@ -1,7 +1,7 @@
 import React from 'react';
 
 function SignupPage() {
-  const formUrl = 'https://forms.gle/neKyxP3QSHGTzk5TA';
+  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeDPBLC-no3rqs7af_x83xONhV270XL8ECduMGq-tupZNlgSg/viewform';
 
   const pageStyles = {
     backgroundImage: `url(${require("../docs/wall-shed.jpg")})`,
