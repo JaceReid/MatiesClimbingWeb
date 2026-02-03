@@ -69,7 +69,7 @@ function NewsPage() {
 
     return (
         <div style={background}>
-            <div className="container" style={{ height: '100vh', overflow: 'hidden' }}>
+            {/* <div className="container" style={{ height: '100vh', overflow: 'hidden' }}>
                 <h2 className="d-flex justify-content-center" style={title}>Our reports</h2>
                 <div style={contentPanel}>
                     <div className="row">
@@ -107,7 +107,7 @@ function NewsPage() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

@@ -76,9 +76,9 @@ const Navbar = () => {
               <li className="nav-item px-2">
                 <a className="nav-link" href="/home">Home</a>
               </li>
-              <li className="nav-item px-2">
+              {/* <li className="nav-item px-2">
                 <a className="nav-link" href="/news">News</a>
-              </li>
+              </li> */}
               <li className="nav-item px-2">
                 <a className="nav-link" href="/about">About</a>
               </li>
