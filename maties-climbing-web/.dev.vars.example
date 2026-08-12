@@ -1,0 +1,18 @@
+# Copy to .dev.vars (gitignored) for local development.
+#
+# Production values are set as Pages secrets, for BOTH the production and
+# preview environments:
+#   npx wrangler pages secret put CALLMEBOT_PHONE  --project-name matiesclimbingweb
+#   npx wrangler pages secret put CALLMEBOT_APIKEY --project-name matiesclimbingweb
+#   npx wrangler pages secret put ADMIN_TOKEN      --project-name matiesclimbingweb
+#   npx wrangler pages secret put IP_SALT          --project-name matiesclimbingweb
+
+# The gear officer's WhatsApp number, and the key CallMeBot issued for it.
+# Get a key by messaging the CallMeBot number from that phone once.
+# Leave blank to skip notifications entirely - bookings still work.
+CALLMEBOT_PHONE=
+CALLMEBOT_APIKEY=
+
+# Generate real ones with: openssl rand -base64 32
+ADMIN_TOKEN=local-dev-token
+IP_SALT=local-dev-salt

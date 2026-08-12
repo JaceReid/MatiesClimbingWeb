@@ -9,8 +9,17 @@
 /coverage
 
 # production
+# NB: the previous patterns here matched nothing - `/build` only matches a
+# repo-root build/ (which doesn't exist), and a gitignore pattern cannot start
+# with `./`, so `./maties-climbing-web/build` was inert. That is why build
+# output ended up tracked.
 /build
-./maties-climbing-web/build
+maties-climbing-web/build/
+
+# cloudflare
+maties-climbing-web/.wrangler/
+.dev.vars
+maties-climbing-web/.dev.vars
 
 # misc
 .DS_Store

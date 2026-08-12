@@ -15,10 +15,13 @@
     "run": "^1.5.0",
     "web-vitals": "^2.1.4"
   },
+  "proxy": "http://localhost:8788",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": "npx wrangler deploy",
+    "api": "wrangler pages dev --port 8788",
+    "db:reset": "wrangler d1 execute maties-gear --local --file=./db/drop.sql && wrangler d1 execute maties-gear --local --file=./db/schema.sql && wrangler d1 execute maties-gear --local --file=./db/seed.sql",
+    "db:test": "python3 db/test_schema.py",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -39,5 +42,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "wrangler": "^4.119.0"
   }
 }

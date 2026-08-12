@@ -1,0 +1,33 @@
+# Cloudflare Pages configuration.
+#
+# IMPORTANT, two things that will silently break the site if missed:
+#
+#  1. Once this file exists, Pages IGNORES bindings and the build output
+#     directory configured in the dashboard. Everything must live here.
+#  2. Pages build system v1 does not read this file at all. Check
+#     Settings -> Builds -> Build system version and set it to the latest.
+#     Otherwise env.DB is undefined in production while working locally.
+#
+# This file must sit at the Pages "Root directory" (maties-climbing-web),
+# not at the repo root.
+
+name = "matiesclimbingweb"              # must equal the Pages project name exactly
+compatibility_date = "2025-05-14"
+pages_build_output_dir = "./build"
+
+# Production database.
+# Create with:  npx wrangler d1 create maties-gear
+[[d1_databases]]
+binding = "DB"
+database_name = "maties-gear"
+database_id = "bbcdf446-1c3e-4be0-a2f6-322054b7f224"
+
+# Preview deployments get their own database. Without this, every branch push
+# writes real bookings and fires real WhatsApp messages.
+# Create with:  npx wrangler d1 create maties-gear-preview
+[env.preview]
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "maties-gear-preview"
+database_id = "b363c188-383b-4e4d-92df-3a151e941353"

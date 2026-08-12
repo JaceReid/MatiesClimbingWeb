@@ -8,6 +8,8 @@ import AboutPage from "./pages/about";
 import GalleryPage from "./pages/gallery";
 import NoPage from "./pages/nopage";
 import SignupPage from "./pages/signup";
+import GearPage from "./pages/gear";
+import GearAdminPage from "./pages/gearadmin";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/gear" element={<GearPage />} />
+          <Route path="/admin/gear" element={<GearAdminPage />} />
           <Route path="*" element={<NoPage />} />
         </Routes>
     </>

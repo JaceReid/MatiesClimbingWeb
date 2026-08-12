@@ -1,0 +1,39 @@
+/* Fixed-width quantity readout so the stepper doesn't jump between 0 and 1. */
+.gear-qty {
+  min-width: 2.5rem;
+  color: #212529;
+  opacity: 1;
+}
+
+.gear-item-unavailable {
+  opacity: 0.65;
+}
+
+/* Honeypot: off-screen rather than display:none, because some bots skip
+   inputs that aren't rendered. Never shown to a human, never focusable. */
+.gear-hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Admin -------------------------------------------------------------- */
+
+.gear-admin-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.gear-admin-ref {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 600;
+}
+
+.gear-admin-itemname {
+  flex: 0 0 9rem;
+  width: 9rem;
+}

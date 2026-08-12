@@ -2,6 +2,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./page.css";
 import gymRules from "../docs/MatiesRulesPoster.png";
+import comm from "../docs/comm-2026.jpeg";
 
 function AboutPage() {
   const background = {
@@ -116,9 +117,20 @@ function AboutPage() {
         <section className="mb-5">
           <h2 className="text-primary mb-4 text-center">Gear Rental</h2>
           <div className="text-center">
-            <a href="https://forms.gle/Kxwq3JsuegHBv1iq5" className="btn btn-primary btn-lg">
-              Rent Gear Online
+            <a href="/gear" className="btn btn-primary btn-lg">
+              Book Gear Online
             </a>
+            <div className="mt-3">
+              {/* Kept as a fallback for one term while people get used to the
+                  new page. Remove it after that - anything booked through the
+                  form is invisible to the availability calendar. */}
+              <a
+                href="https://forms.gle/Kxwq3JsuegHBv1iq5"
+                className="link-secondary small"
+              >
+                Or use the old rental form
+              </a>
+            </div>
           </div>
         </section>
 
@@ -151,6 +163,17 @@ function AboutPage() {
           </div>
         </section>
           
+         <section className="mb-5">
+          <h2 className="text-primary mb-4 text-center">The 2026 Committee</h2>
+          <div className="text-center">
+            <img 
+              src={comm} 
+              alt="Gym Rules Poster" 
+              className="img-fluid rounded shadow"
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+          </div>
+        </section>
         </div>
       </div>
     </div>

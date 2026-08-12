@@ -1,0 +1,65 @@
+/* 14 equal columns that shrink with the viewport rather than scrolling.
+   Fixed width (not just max-width) so that strips stacked in a row - as on the
+   admin edit panel - line up with each other instead of drifting with the
+   length of the label beside them. */
+.gear-strip {
+  width: 22rem;
+  max-width: 100%;
+  flex: 0 1 22rem;
+  user-select: none;
+}
+
+.gear-strip-row {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  align-items: center;
+}
+
+.gear-strip-cell {
+  text-align: center;
+  line-height: 1.1;
+}
+
+.gear-strip-weekdays {
+  font-size: 0.65rem;
+  color: #6c757d;
+  letter-spacing: 0;
+}
+
+.gear-dot {
+  font-size: 1.05rem;
+  cursor: default;
+}
+
+.gear-dot-all {
+  color: #198754;
+}
+
+.gear-dot-some {
+  color: #fd7e14;
+}
+
+.gear-dot-none {
+  color: #dc3545;
+}
+
+.gear-dot-selected {
+  font-weight: bold;
+}
+
+.gear-strip-underline {
+  height: 0.35rem;
+}
+
+.gear-strip-bar {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background-color: #0d6efd;
+}
+
+@media (max-width: 400px) {
+  .gear-dot {
+    font-size: 0.95rem;
+  }
+}
