@@ -1,8 +1,26 @@
 // export default AboutPage;
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./page.css";
-import gymRules from "../docs/MatiesRulesPoster.png";
 import comm from "../docs/comm-2026.jpeg";
+
+// Wall rules and fees. Edit these two lists to change what the About page
+// shows - they replace the old MatiesRulesPoster.png, which meant re-exporting
+// an image every time a price changed.
+const WALL_RULES = [
+  "Safety third. Use the mats, make sure there are no gaps, and don't walk under people climbing.",
+  "Do not set climbs or change/add holds on the wall.",
+  "No climbing on the wall without climbing shoes.",
+  "No climbing on the wall while maintenance or route setting is taking place.",
+  "Turn off the lights and lock the door if you are the last person to leave.",
+  "Respect your fellow climbers, just be a lekker ou.",
+  "Respect the venue. Don't leave your bag on the couch, and don't leave rubbish on the floor.",
+];
+
+const FEES = [
+  { label: "Day pass (includes shoes)", price: "R50" },
+  { label: "Membership (half year, students)", price: "R450" },
+  { label: "Non-student membership (half year)", price: "R650" },
+];
 
 function AboutPage() {
   const background = {
@@ -72,7 +90,7 @@ function AboutPage() {
                 <div className="card shadow-sm">
                   <div className="card-body">
                     <ul className="list-unstyled">
-                      <li className="mb-2">💰 <strong>Membership:</strong> R680/year (students), R880 (non-students)</li>
+                      <li className="mb-2">💰 <strong>Membership:</strong> R450/half year (students), R650 (non-students)</li>
                       <li className="mb-2">🎟️ <strong>Day pass:</strong> R50 (shoes included)</li>
                       <li className="mb-0">💳 Payments via EFT or Student Account</li>
                     </ul>
@@ -150,16 +168,48 @@ function AboutPage() {
           </div>
         </section>
 
-        {/* Gym Rules */}
-        <section className="mb-5">
-          <h2 className="text-primary mb-4 text-center">Gym Rules</h2>
-          <div className="text-center">
-            <img 
-              src={gymRules} 
-              alt="Gym Rules Poster" 
-              className="img-fluid rounded shadow"
-              style={{ maxWidth: "100%", height: "auto" }}
-            />
+        {/* Gym Rules
+            Was a PNG poster (MatiesRulesPoster.png). Now plain markup so the
+            rules and prices can be edited here instead of re-exporting an
+            image - and so it stays readable on a phone and to screen readers. */}
+        <section className="mb-5" style={contentStyle}>
+          <h2 className="text-primary mb-4 text-center">Climbing Wall Rules</h2>
+          <div className="row g-4">
+            <div className="col-md-7">
+              <ol className="mb-0">
+                {WALL_RULES.map((rule, i) => (
+                  <li key={i} className="mb-3">
+                    {rule}
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="col-md-5">
+              <h3 className="h5 text-primary border-bottom pb-2">Fees &amp; Memberships</h3>
+              <table className="table table-sm">
+                <tbody>
+                  {FEES.map((fee) => (
+                    <tr key={fee.label}>
+                      <td className="ps-0 border-0">{fee.label}</td>
+                      <td className="text-end pe-0 border-0 fw-semibold">{fee.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <p className="small">
+                Ask a committee member for help with day passes or memberships.
+              </p>
+              <p className="small">
+                Gear rental is also available to members who are experienced and know how to use
+                the gear &mdash; <a href="/gear">book it here</a>.
+              </p>
+              <p className="small mb-0">
+                Contact us:{" "}
+                <a href="mailto:matiesclimbing@gmail.com">matiesclimbing@gmail.com</a>
+              </p>
+            </div>
           </div>
         </section>
           
