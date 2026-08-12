@@ -21,21 +21,69 @@ export async function loadItem(db, id) {
   return db.prepare(`SELECT ${ITEM_COLUMNS} FROM gear_items WHERE id = ?`).bind(id).first();
 }
 
-export async function updateItem(db, id, { quantity, active }) {
+// Maps the API's camelCase onto columns. Anything not listed here cannot be
+// written from the admin page - notably `id`, which is permanent once bookings
+// reference it.
+const ITEM_WRITABLE = {
+  name: "name",
+  description: "description",
+  quantity: "quantity",
+  maxPerBooking: "max_per_booking",
+  pricePerDay: "price_per_day",
+  depositNote: "deposit_note",
+  sortOrder: "sort_order",
+  active: "active",
+};
+
+export async function updateItem(db, id, patch) {
   const sets = [];
   const binds = [];
-  if (quantity !== undefined) {
-    sets.push("quantity = ?");
-    binds.push(quantity);
-  }
-  if (active !== undefined) {
-    sets.push("active = ?");
-    binds.push(active ? 1 : 0);
+  for (const [key, column] of Object.entries(ITEM_WRITABLE)) {
+    if (patch[key] === undefined) continue;
+    sets.push(`${column} = ?`);
+    binds.push(key === "active" ? (patch[key] ? 1 : 0) : patch[key]);
   }
   if (!sets.length) return loadItem(db, id);
   binds.push(id);
   await db.prepare(`UPDATE gear_items SET ${sets.join(", ")} WHERE id = ?`).bind(...binds).run();
   return loadItem(db, id);
+}
+
+/**
+ * Create a gear type. Returns { error: 'duplicate' } rather than throwing if
+ * the id is taken, so the caller can suggest a different name.
+ */
+export async function createItem(db, id, item) {
+  const existing = await loadItem(db, id);
+  if (existing) return { error: "duplicate" };
+
+  await db
+    .prepare(
+      `INSERT INTO gear_items
+         (id, name, description, quantity, max_per_booking,
+          price_per_day, deposit_note, sort_order, active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(
+      id,
+      item.name,
+      item.description ?? null,
+      item.quantity,
+      item.maxPerBooking,
+      item.pricePerDay,
+      item.depositNote ?? null,
+      item.sortOrder ?? (await nextSortOrder(db)),
+      item.active === false ? 0 : 1
+    )
+    .run();
+
+  return { item: await loadItem(db, id) };
+}
+
+/** Put new gear at the end of the list by default. */
+async function nextSortOrder(db) {
+  const row = await db.prepare(`SELECT COALESCE(MAX(sort_order), 0) AS n FROM gear_items`).first();
+  return (row?.n ?? 0) + 10;
 }
 
 /* ----------------------------------------------------------- availability */

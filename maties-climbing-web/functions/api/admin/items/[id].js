@@ -1,15 +1,16 @@
-// PATCH /api/admin/items/:id -> { quantity?, active? }
+// PATCH /api/admin/items/:id
 //
-// Lets the gear officer adjust stock from a phone when a pad delaminates,
-// without a redeploy or a wrangler command.
+// Edits name, description, price, quantity, max per booking, deposit note and
+// active. The id itself is not editable: booking history references it.
 //
 // Lowering a quantity below what's already booked is allowed but never
-// silently cancels anything: the response reports which days are now
+// silently cancels anything - the response reports which days are now
 // over-committed so the admin knows who to phone.
 
 import { todayLocal } from "../../../../lib/gear/dates.js";
-import { badRequest, notFound, ok } from "../../../../lib/gear/http.js";
+import { badRequest, notFound, ok, readJson } from "../../../../lib/gear/http.js";
 import { bookingWindow, loadItem, peakCommitted, updateItem } from "../../../../lib/gear/queries.js";
+import { validateGearItem } from "../../../../lib/gear/validate.js";
 
 export async function onRequestGet({ params, env }) {
   const item = await loadItem(env.DB, params.id);
@@ -20,24 +21,13 @@ export async function onRequestPatch({ params, request, env }) {
   const item = await loadItem(env.DB, params.id);
   if (!item) return notFound("No such gear.");
 
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return badRequest("Malformed request.");
-  }
+  const parsed = await readJson(request);
+  if (parsed.error) return badRequest("Malformed request.");
 
-  const patch = {};
-  if (body.quantity !== undefined) {
-    const q = Number(body.quantity);
-    if (!Number.isInteger(q) || q < 0 || q > 999) {
-      return badRequest("Quantity must be a whole number.", { quantity: "0 to 999." });
-    }
-    patch.quantity = q;
-  }
-  if (body.active !== undefined) patch.active = !!body.active;
+  const checked = validateGearItem(parsed.value || {}, { partial: true });
+  if (checked.fields) return badRequest("Please check the highlighted fields.", checked.fields);
 
-  const updated = await updateItem(env.DB, params.id, patch);
+  const updated = await updateItem(env.DB, params.id, checked.value);
 
   const window = bookingWindow(todayLocal());
   const committed = await peakCommitted(env.DB, params.id, window.start, window.end);

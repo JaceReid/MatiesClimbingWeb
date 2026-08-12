@@ -127,6 +127,73 @@ export function validateItems(rawItems, catalogue) {
   return { value: items };
 }
 
+/**
+ * Validate a gear item coming from the admin page.
+ *
+ * `partial` is true for PATCH, where only the supplied keys are checked - this
+ * is what lets the quantity stepper send just { quantity } without having to
+ * round-trip every other field.
+ */
+export function validateGearItem(body, { partial = false } = {}) {
+  const fields = {};
+  const value = {};
+
+  const has = (key) => body[key] !== undefined;
+  const required = (key) => !partial || has(key);
+
+  if (required("name")) {
+    const name = str(body.name);
+    if (name.length < 2 || name.length > 60) {
+      fields.name = "Name must be 2-60 characters.";
+    } else {
+      value.name = name;
+    }
+  }
+
+  if (has("description")) {
+    const description = str(body.description);
+    if (description.length > 200) fields.description = "Keep it under 200 characters.";
+    else value.description = description || null;
+  }
+
+  if (has("depositNote")) {
+    const note = str(body.depositNote);
+    if (note.length > 200) fields.depositNote = "Keep it under 200 characters.";
+    else value.depositNote = note || null;
+  }
+
+  const wholeNumber = (key, label, { min = 0, max = 9999 }) => {
+    if (!required(key)) return;
+    const n = Number(body[key]);
+    if (!Number.isInteger(n) || n < min || n > max) {
+      fields[key] = `${label} must be a whole number between ${min} and ${max}.`;
+    } else {
+      value[key] = n;
+    }
+  };
+
+  wholeNumber("quantity", "Quantity", { min: 0, max: 999 });
+  wholeNumber("pricePerDay", "Price", { min: 0, max: 9999 });
+  wholeNumber("maxPerBooking", "Max per booking", { min: 1, max: 999 });
+  if (has("sortOrder")) wholeNumber("sortOrder", "Sort order", { min: 0, max: 9999 });
+
+  if (has("active")) value.active = !!body.active;
+
+  return Object.keys(fields).length ? { fields } : { value };
+}
+
+/**
+ * Turn a gear name into a URL-safe id. Ids are permanent once bookings
+ * reference them, so this only runs when creating an item.
+ */
+export function slugify(name) {
+  return str(name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}
+
 /** Booking reference: short, unambiguous, safe to read aloud. */
 export function makeRef() {
   const bytes = crypto.getRandomValues(new Uint8Array(4));

@@ -12,6 +12,80 @@ import AvailabilityStrip from "../components/AvailabilityStrip";
 
 const TOKEN_KEY = "maties-gear-admin-token";
 
+// Add/edit form for a gear type. Shared by the "Add gear" panel and each row's
+// Edit panel, so the two can never drift apart.
+//
+// Note there is no id field: ids are derived from the name when gear is created
+// and are permanent afterwards, because booking history points at them.
+// Renaming gear changes the display name only.
+function GearForm({ values, fields, busy, onChange, onSave, onCancel, saveLabel }) {
+  const set = (key) => (event) => {
+    const raw = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+    const numeric = ["quantity", "maxPerBooking", "pricePerDay"].includes(key);
+    onChange({ ...values, [key]: numeric ? Number(raw) : raw });
+  };
+
+  const field = (key, label, extra = {}) => (
+    <div className={extra.wide ? "col-12" : "col-6 col-md-3"}>
+      <label className="form-label small mb-1" htmlFor={`gear-${key}`}>
+        {label}
+      </label>
+      <input
+        id={`gear-${key}`}
+        className={`form-control form-control-sm ${fields?.[key] ? "is-invalid" : ""}`}
+        type={extra.type || "text"}
+        min={extra.min}
+        value={values[key]}
+        placeholder={extra.placeholder}
+        onChange={set(key)}
+      />
+      {fields?.[key] && <div className="invalid-feedback">{fields[key]}</div>}
+    </div>
+  );
+
+  return (
+    <div className="border-top mt-2 pt-3">
+      <div className="row g-2">
+        {field("name", "Name", { wide: true, placeholder: "Nut key" })}
+        {field("description", "Description", {
+          wide: true,
+          placeholder: "Shown under the name on the booking page",
+        })}
+        {field("pricePerDay", "Price per day (R)", { type: "number", min: 0 })}
+        {field("quantity", "How many", { type: "number", min: 0 })}
+        {field("maxPerBooking", "Max per booking", { type: "number", min: 1 })}
+        <div className="col-6 col-md-3 d-flex align-items-end">
+          <div className="form-check form-switch mb-1">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="gear-active"
+              checked={!!values.active}
+              onChange={set("active")}
+            />
+            <label className="form-check-label small" htmlFor="gear-active">
+              Bookable
+            </label>
+          </div>
+        </div>
+        {field("depositNote", "Deposit note", {
+          wide: true,
+          placeholder: "Leave blank if no deposit is needed",
+        })}
+      </div>
+
+      <div className="mt-3 d-flex gap-2">
+        <button className="btn btn-sm btn-primary" disabled={busy} onClick={onSave}>
+          {busy ? "Saving…" : saveLabel}
+        </button>
+        <button className="btn btn-sm btn-outline-secondary" onClick={onCancel}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function useAdminToken() {
   const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) || "");
   const save = (value) => {
@@ -35,6 +109,7 @@ function GearAdminPage() {
   const [load, setLoad] = useState("idle"); // idle | loading | ready | error | unauthorized
   const [busy, setBusy] = useState(null); // id of the booking being mutated
   const [editing, setEditing] = useState(null); // { id, startDate, endDate, items:{id:qty} }
+  const [editingItem, setEditingItem] = useState(null); // { id | null, values } - null id = new gear
   const [message, setMessage] = useState(null);
 
   const pageBackground = {
@@ -212,6 +287,31 @@ function GearAdminPage() {
     }
     setMessage({ kind: "success", text: "Booking updated." });
     setEditing(null);
+    refresh();
+  };
+
+  const saveGear = async () => {
+    const isNew = editingItem.id === null;
+    setBusy(editingItem.id ?? "new");
+    setMessage(null);
+    const { status: code, body } = await api(
+      isNew ? "/api/admin/items" : `/api/admin/items/${editingItem.id}`,
+      { method: isNew ? "POST" : "PATCH", body: JSON.stringify(editingItem.values) }
+    );
+    setBusy(null);
+    if (code !== 200 && code !== 201) {
+      setMessage({ kind: "warning", text: body.message || "Not saved.", fields: body.fields });
+      return;
+    }
+    setMessage({
+      kind: body.overcommitted?.length ? "warning" : "success",
+      text: body.overcommitted?.length
+        ? `Saved, but ${body.overcommitted.length} day(s) are now over-committed. No bookings were cancelled - phone the people affected.`
+        : isNew
+        ? `Added ${body.item.name}.`
+        : `${body.item.name} updated.`,
+    });
+    setEditingItem(null);
     refresh();
   };
 
@@ -565,58 +665,133 @@ function GearAdminPage() {
 
         {tab === "inventory" && (
           <div className="gear-admin-card">
-            <p className="text-muted small">
-              Changing a quantity never cancels existing bookings. If you drop below what's already
-              booked you'll get a warning telling you how many days are affected.
-            </p>
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="d-flex justify-content-between align-items-center gap-3 py-2 border-bottom flex-wrap"
+            <div className="d-flex justify-content-between align-items-start gap-2 mb-3 flex-wrap">
+              <p className="text-muted small mb-0" style={{ maxWidth: "34rem" }}>
+                The stepper and switch save immediately. Use Edit for the name, price, description
+                or deposit note. Changing a quantity never cancels existing bookings &mdash; if you
+                drop below what's already booked you'll get a warning saying how many days are
+                affected.
+              </p>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={() =>
+                  setEditingItem(
+                    editingItem?.id === null
+                      ? null
+                      : {
+                          id: null,
+                          values: {
+                            name: "",
+                            description: "",
+                            quantity: 1,
+                            maxPerBooking: 1,
+                            pricePerDay: 0,
+                            depositNote: "",
+                            active: true,
+                          },
+                        }
+                  )
+                }
               >
-                <div>
-                  <div className={item.active ? "" : "text-muted text-decoration-line-through"}>
-                    {item.name}{" "}
-                    <span className="text-muted">
-                      &middot; {item.price_per_day > 0 ? `R${item.price_per_day}/day` : "free"}
-                    </span>
+                {editingItem?.id === null ? "Close" : "+ Add gear"}
+              </button>
+            </div>
+
+            {editingItem?.id === null && (
+              <GearForm
+                values={editingItem.values}
+                fields={message?.fields}
+                busy={busy === "new"}
+                onChange={(values) => setEditingItem({ id: null, values })}
+                onSave={saveGear}
+                onCancel={() => setEditingItem(null)}
+                saveLabel="Add gear"
+              />
+            )}
+
+            {items.map((item) => (
+              <div key={item.id} className="py-2 border-bottom">
+                <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                  <div>
+                    <div className={item.active ? "" : "text-muted text-decoration-line-through"}>
+                      {item.name}{" "}
+                      <span className="text-muted">
+                        &middot; {item.price_per_day > 0 ? `R${item.price_per_day}/day` : "free"}
+                        {item.max_per_booking > 1 ? ` · max ${item.max_per_booking}` : ""}
+                      </span>
+                    </div>
+                    <div className="text-muted small">
+                      {item.description}
+                      {item.deposit_note ? ` · ${item.deposit_note}` : ""}
+                    </div>
                   </div>
-                  <div className="text-muted small">
-                    {item.description}
-                    {item.deposit_note ? ` · ${item.deposit_note}` : ""}
+                  <div className="d-flex align-items-center gap-2">
+                    <div className="btn-group btn-group-sm">
+                      <button
+                        className="btn btn-outline-secondary"
+                        disabled={busy === item.id || item.quantity === 0}
+                        onClick={() => updateStock(item, { quantity: item.quantity - 1 })}
+                      >
+                        &minus;
+                      </button>
+                      <span className="btn btn-outline-secondary disabled gear-qty">
+                        {item.quantity}
+                      </span>
+                      <button
+                        className="btn btn-outline-secondary"
+                        disabled={busy === item.id}
+                        onClick={() => updateStock(item, { quantity: item.quantity + 1 })}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="form-check form-switch mb-0">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={!!item.active}
+                        disabled={busy === item.id}
+                        onChange={(e) => updateStock(item, { active: e.target.checked })}
+                        aria-label={`${item.name} bookable`}
+                      />
+                    </div>
+                    <button
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() =>
+                        setEditingItem(
+                          editingItem?.id === item.id
+                            ? null
+                            : {
+                                id: item.id,
+                                values: {
+                                  name: item.name,
+                                  description: item.description || "",
+                                  quantity: item.quantity,
+                                  maxPerBooking: item.max_per_booking,
+                                  pricePerDay: item.price_per_day,
+                                  depositNote: item.deposit_note || "",
+                                  active: !!item.active,
+                                },
+                              }
+                        )
+                      }
+                    >
+                      {editingItem?.id === item.id ? "Close" : "Edit"}
+                    </button>
                   </div>
                 </div>
-                <div className="d-flex align-items-center gap-2">
-                  <div className="btn-group btn-group-sm">
-                    <button
-                      className="btn btn-outline-secondary"
-                      disabled={busy === item.id || item.quantity === 0}
-                      onClick={() => updateStock(item, { quantity: item.quantity - 1 })}
-                    >
-                      &minus;
-                    </button>
-                    <span className="btn btn-outline-secondary disabled gear-qty">
-                      {item.quantity}
-                    </span>
-                    <button
-                      className="btn btn-outline-secondary"
-                      disabled={busy === item.id}
-                      onClick={() => updateStock(item, { quantity: item.quantity + 1 })}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className="form-check form-switch mb-0">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      checked={!!item.active}
-                      disabled={busy === item.id}
-                      onChange={(e) => updateStock(item, { active: e.target.checked })}
-                      aria-label={`${item.name} bookable`}
-                    />
-                  </div>
-                </div>
+
+                {editingItem?.id === item.id && (
+                  <GearForm
+                    values={editingItem.values}
+                    fields={message?.fields}
+                    busy={busy === item.id}
+                    onChange={(values) => setEditingItem({ id: item.id, values })}
+                    onSave={saveGear}
+                    onCancel={() => setEditingItem(null)}
+                    saveLabel="Save changes"
+                  />
+                )}
               </div>
             ))}
           </div>
