@@ -7,7 +7,7 @@ import comm from "../docs/comm-2026.jpeg";
 // shows - they replace the old MatiesRulesPoster.png, which meant re-exporting
 // an image every time a price changed.
 const WALL_RULES = [
-  "Safety third. Use the mats, make sure there are no gaps, and don't walk under people climbing.",
+  "Your safety requires your focus. Use the mats, make sure there are no gaps, and don't walk under people climbing.",
   "Do not set climbs or change/add holds on the wall.",
   "No climbing on the wall without climbing shoes.",
   "No climbing on the wall while maintenance or route setting is taking place.",
